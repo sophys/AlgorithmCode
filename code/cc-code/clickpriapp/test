@@ -1,0 +1,7 @@
+#!/usr/bin/expect --
+spawn nc 172.20.0.1 50000
+expect ""
+send "if=clickpriapp\r"
+expect "ok"
+send "|appid=1|userid=1|\r"
+interact
