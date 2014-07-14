@@ -2,115 +2,185 @@
 #include<stdlib.h>
 #include<string.h>
 
-/* 树数据结构*/
+#define SIZE 10
+
 typedef struct node
 {
-	char data;
-	struct node *lchild,*rchild;
+    char data;
+    struct node *lchild,*rchild;
 }Tnode,Tree;
 
-/* 链栈结构 */
-typedef node SElemType;
-typedef struct StackNode
+void preTrav(Tree* T)
 {
-    SElemType *data;
-    struct StackNode *next;
-}StackNode;
+    Tnode *stack[SIZE],*p;
+    int top=-1;
+    if(NULL != T)
+    {
+        top++;
+        stack[top]=T;
+        while(top>-1)
+        {
+            p=stack[top];
+            top--;
 
-typedef struct stack
-{
-    StackNode *top;
-    int count;
-}Stack;
+            printf("%c -> ",p->data);
 
-void initStack(Stack *S)
+            if(NULL != p->rchild)
+            {
+                top++;
+                stack[top]=p->rchild;
+            }
+            if(NULL != p->lchild)
+            {
+                top++;
+                stack[top]=p->lchild;
+            }
+        }
+        printf("\n");
+    }
+}
+void inTrav(Tree *T)
 {
-	S->top=NULL;
-	S->count=0;
+    Tnode *stack[SIZE],*p;
+    int top = -1;
+
+    if(NULL != T)
+    {
+        p=T;
+        while(top > -1 || NULL != p)
+        {
+            while( NULL != p)
+            {
+                top ++;
+                stack[top]=p;
+                p=p->lchild;
+            }
+            if(top > -1)
+            {
+                p = stack[top];
+                top --;
+                printf("%c -> ",p->data);
+                p = p->rchild;
+
+            }
+        }
+        printf("\n");
+    }
+}
+void postTrav(Tree *T)
+{
+    Tnode *stack[SIZE],*p,*q;
+    p = T;
+    int flag,top=-1;
+
+    if(NULL != T)
+    {
+        do
+        {
+            while(NULL != p)
+            {
+                top ++;
+                stack[top] = p;
+                p = p->lchild;
+            }
+            q = NULL;
+            flag = 1;
+            while( -1 != top && flag == 1)
+            {
+                p = stack[top];
+                if(p->rchild == q)
+                {
+                    printf("%c -> ",p->data);
+                    top --;
+                    q=p;
+                }
+                else
+                {
+                    p = p->rchild;
+                    flag = 0;
+                }
+            }
+        }while(-1 != top);
+        printf("\n");
+    }
+
+}
+void levelTrav(Tree *T)
+{
+    Tnode *p;
+    Tnode *queue[SIZE];
+    int front,rear;
+
+    front=rear=0;
+    rear++;
+    queue[rear]=T;
+
+    while(front != rear)
+    {
+        front = (front+1)%SIZE;
+        p = queue[front];
+
+        printf("%c -> ",p->data);
+
+        if(NULL != p->lchild)
+        {
+            rear = (rear+1)%SIZE;
+            queue[rear] = p->lchild;
+        }
+        if(NULL != p->rchild)
+        {
+            rear = (rear+1)%SIZE;
+            queue[rear] = p->rchild;
+        }
+    }
+    printf("\n");
 }
 
-void push(Stack *S,SElemType *d)
-{
-	StackNode *t = (StackNode*)malloc(sizeof(StackNode));
-
-    t->data=d;
-    t->next=S->top;	/* 把当前的栈顶元素赋值给新结点的直接后继，见图中① */
-    S->top=t;         /* 将新的结点s赋值给栈顶指针，见图中② */
-    S->count++;
-}
-Tnode* pop(Stack* S)
-{
-    StackNode *p;
-    if(empty(*S))
-        return -1;
-		
-    Tnode *e=S->top->data;
-    p=S->top;					/* 将栈顶结点赋值给p，见图中③ */
-    S->top=S->top->next;    /* 使得栈顶指针下移一位，指向后一结点，见图中④ */
-    free(p);                    /* 释放结点p */
-    S->count--;
-    return e;	
-}
-Tnode* top(Stack *S)
-{
-	return S->top->data;
-}
-
-int empty(Stack *S)
-{
-	if(S->count)
-		return 0;
-	else
-		return	1;
-}
-
-/*main*/
-void inTrav(Tree* T)
-{
-	Stack *S = (Stack*)malloc(sizeof(Stack));
-	initStack(S);
-	Tnode* p;
-	
-	while(p||!empty(S))
-	{
-		if(p)
-		{
-			push(S,p);
-			p=p->lchild;
-		}
-		else
-		{
-			p=pop(S);
-			printf("",p->data);
-			p=p->rchild;
-		}
-	}
-}
-
+/*
+ *       A
+ *      / \
+ *     B   C
+ *    /   /
+ *   E   D
+*/
 Tree* initTree(void)
 {
-	Tnode *A = (Tnode*)malloc(sizeof(Tnode));
-	Tnode *B  (Tnode*)malloc(sizeof(Tnode));
-	Tnode *B  (Tnode*)malloc(sizeof(Tnode));
-	Tnode *C  (Tnode*)malloc(sizeof(Tnode));
-	A->data = 'A';
-	B->data = 'B';
-	C->data = 'C';
-	D->data = 'D';
-	
-	A->lchild = B;
-	A->rchild = C;
-	B->lchild = NULL;
-	B->rchild = NULL;
-	C->lchild = D;
-	C->rchild = NULL;
-	D->rchild = NULL;
-	D->lchild = NULL;
-	return A;
+    Tnode *A = (Tnode*)malloc(sizeof(Tnode));
+    Tnode *B = (Tnode*)malloc(sizeof(Tnode));
+    Tnode *C = (Tnode*)malloc(sizeof(Tnode));
+    Tnode *D = (Tnode*)malloc(sizeof(Tnode));
+    Tnode *E = (Tnode*)malloc(sizeof(Tnode));
+    A->data = 'A';
+    B->data = 'B';
+    C->data = 'C';
+    D->data = 'D';
+    E->data = 'E';
+
+    A->lchild = B;
+    A->rchild = C;
+    B->lchild = E;
+    B->rchild = NULL;
+    C->lchild = D;
+    C->rchild = NULL;
+    D->rchild = NULL;
+    D->lchild = NULL;
+    E->rchild = NULL;
+    E->lchild = NULL;
+    return A;
 }
 int main()
 {
-	Tree* T=initTree();
-	inTrav(T);
-	return 0;
+    Tree* T=initTree();
+    printf("preOrder Travel:");
+    preTrav(T);
+
+    printf("inOrder Travel:");
+    inTrav(T);
+
+    printf("postOrder Travel:");
+    postTrav(T);
+
+    printf("leveltOrder Travel:");
+    levelTrav(T);
+    return 0;
 }
